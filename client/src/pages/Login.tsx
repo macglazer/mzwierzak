@@ -13,19 +13,36 @@ const Login: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setError('');
+  //   setIsLoading(true);
+    
+  //   try {
+  //     await login(email, password);
+  //     navigate('/');
+  //   } catch (err: any) {
+  //     setError(err.response?.data?.message || 'Błąd logowania. Spróbuj ponownie.');
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setIsLoading(true);
-    
-    try {
-      await login(email, password);
-      navigate('/');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Błąd logowania. Spróbuj ponownie.');
-    } finally {
-      setIsLoading(false);
-    }
+    if (!email || !password) return;
+
+    console.log('test losia');
+  
+    const fakeUser = {
+      name: email.split('@')[0],
+      email,
+      id: 'temp-id',
+    };
+    localStorage.setItem('user', JSON.stringify(fakeUser));
+    localStorage.setItem('token', 'mock-token');
+  
+    navigate('/');
   };
 
   return (

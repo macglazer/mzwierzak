@@ -5,26 +5,32 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 // Importuj strony
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import PetProfile from './pages/PetProfile';
+import ShareHistory from './pages/ShareHistory';
+import ScanDocument from './pages/ScanDocument';
 
 // Komponent chronionej ścieżki
 const ProtectedRoute: React.FC<{ element: React.ReactElement }> = ({ element }) => {
   const { isAuthenticated, loading } = useAuth();
-  
+
   if (loading) {
     return <div>Ładowanie...</div>;
   }
-  
+
   return isAuthenticated ? element : <Navigate to="/login" />;
 };
 
 const AppRoutes: React.FC = () => {
   return (
-    <Routes>
+  <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      
-      {/* Przekierowanie dla nieznanych ścieżek */}
-      <Route path="*" element={<Navigate to="/login" />} />
+      <Route path="/" element={<Dashboard />} />
+      <Route path="/pets/:id" element={<PetProfile />} />
+      <Route path="/scan" element={<ScanDocument />} />
+      <Route path="/share" element={<ShareHistory />} />
+      <Route path="*" element={<Login />} /> {/* lub <Navigate to="/login" /> jeśli masz zaimportowane */}
     </Routes>
   );
 };
