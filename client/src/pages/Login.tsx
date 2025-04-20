@@ -41,7 +41,7 @@ const Login: React.FC = () => {
   //   localStorage.setItem('user', JSON.stringify(fakeUser));
   //   localStorage.setItem('token', 'mock-token');
   
-  //   navigate('/dashboard');
+  //   navigate('/dashboard');eact App
   // };
 
   const handleSubmit = (e: React.FormEvent) => {
