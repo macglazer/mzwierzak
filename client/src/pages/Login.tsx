@@ -32,7 +32,6 @@ const Login: React.FC = () => {
     e.preventDefault();
     if (!email || !password) return;
 
-    console.log('test losia');
   
     const fakeUser = {
       name: email.split('@')[0],
@@ -42,7 +41,7 @@ const Login: React.FC = () => {
     localStorage.setItem('user', JSON.stringify(fakeUser));
     localStorage.setItem('token', 'mock-token');
   
-    navigate('/');
+    navigate('/dashboard');
   };
 
   return (

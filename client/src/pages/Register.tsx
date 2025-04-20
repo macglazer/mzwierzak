@@ -35,7 +35,7 @@ const Register: React.FC = () => {
     
     try {
       await register(name, email, password);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Błąd rejestracji. Spróbuj ponownie.');
     } finally {
