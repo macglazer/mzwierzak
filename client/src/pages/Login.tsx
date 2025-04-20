@@ -28,19 +28,25 @@ const Login: React.FC = () => {
   //   }
   // };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !password) return;
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   if (!email || !password) return;
 
   
-    const fakeUser = {
-      name: email.split('@')[0],
-      email,
-      id: 'temp-id',
-    };
-    localStorage.setItem('user', JSON.stringify(fakeUser));
-    localStorage.setItem('token', 'mock-token');
+  //   const fakeUser = {
+  //     name: email.split('@')[0],
+  //     email,
+  //     id: 'temp-id',
+  //   };
+  //   localStorage.setItem('user', JSON.stringify(fakeUser));
+  //   localStorage.setItem('token', 'mock-token');
   
+  //   navigate('/dashboard');
+  // };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.includes('@')) return;
     navigate('/dashboard');
   };
 
