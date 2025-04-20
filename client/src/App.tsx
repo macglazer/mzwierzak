@@ -11,6 +11,8 @@ import ShareHistory from './pages/ShareHistory';
 import ScanDocument from './pages/ScanDocument';
 import AddPet from './pages/AddPet';
 import MedicalHistory from './pages/MedicalHistory';
+import MedicalRecordDetails from './pages/MedicalRecordDetails';
+import AddMedicalRecord from './pages/AddMedicalRecord';
 
 // Komponent chronionej ścieżki
 interface ProtectedRouteProps {
@@ -19,8 +21,6 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
-  
-
   
   if (loading) {
     return <div className="flex justify-center items-center h-screen">
@@ -75,6 +75,19 @@ const AppRoutes: React.FC = () => {
       <Route path="/history" element={
         <ProtectedRoute>
           <MedicalHistory />
+        </ProtectedRoute>
+      } />
+      
+      {/* Nowe ścieżki dla historii medycznej */}
+      <Route path="/history/add" element={
+        <ProtectedRoute>
+          <AddMedicalRecord />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/history/:id" element={
+        <ProtectedRoute>
+          <MedicalRecordDetails />
         </ProtectedRoute>
       } />
       
