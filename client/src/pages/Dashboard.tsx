@@ -1,18 +1,92 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, QrCode, FileText, Menu, Plus, Calendar, Clock } from 'lucide-react';
+import { Camera, QrCode, FileText, Menu, Plus, Calendar, Clock, Bell, X, Settings, LogOut } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(2);
+  
+  // Przykładowe dane użytkownika
+  const user = {
+    name: "Jan Kowalski",
+    email: "jan.kowalski@example.com"
+  };
+  
+  // Pobieramy inicjały
+  const getInitials = (name: string) => {
+    return name.split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase();
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="min-h-screen bg-gray-50 p-4 relative">
       <header className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-blue-700">mZwierzak</h1>
-        <button className="p-2 rounded hover:bg-gray-100">
-          <Menu className="w-6 h-6 text-gray-600" />
-        </button>
+        <div className="flex items-center space-x-3">
+          <div className="relative cursor-pointer">
+            <Bell 
+              className="w-6 h-6 text-gray-600"
+              onClick={() => setNotificationCount(0)}
+            />
+            {notificationCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center">
+                {notificationCount}
+              </span>
+            )}
+          </div>
+          <div 
+            className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center cursor-pointer"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {getInitials(user.name)}
+          </div>
+        </div>
       </header>
+      
+      {/* Wysuwalny panel użytkownika */}
+      {isMenuOpen && (
+        <div className="absolute top-0 right-0 h-full w-64 bg-white shadow-lg z-10 transition-transform transform-gpu">
+          <div className="p-4 border-b">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="font-semibold">Menu</h2>
+              <button onClick={() => setIsMenuOpen(false)}>
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            <div className="flex items-center mb-2">
+              <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center mr-3">
+                {getInitials(user.name)}
+              </div>
+              <div>
+                <p className="font-medium">{user.name}</p>
+                <p className="text-xs text-gray-500">{user.email}</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-4">
+            <ul className="space-y-3">
+              <li>
+                <button className="flex items-center text-gray-700 hover:text-blue-600 w-full">
+                  <Settings className="w-5 h-5 mr-3" />
+                  Ustawienia
+                </button>
+              </li>
+              <li>
+                <button 
+                  className="flex items-center text-gray-700 hover:text-blue-600 w-full"
+                  onClick={() => navigate('/login')}
+                >
+                  <LogOut className="w-5 h-5 mr-3" />
+                  Wyloguj
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      )}
 
       <section className="mb-6">
         <h2 className="text-lg font-semibold text-gray-800 mb-2">Twoje zwierzaki</h2>
@@ -31,7 +105,10 @@ const Dashboard: React.FC = () => {
               <p className="text-sm text-gray-500">Kot, Europejski, 2 lata</p>
             </div>
           </div>
-          <button className="w-full flex items-center justify-center text-blue-600 border border-dashed border-blue-400 p-3 rounded-lg hover:bg-blue-50 transition-colors mt-2">
+          <button 
+            onClick={() => navigate('/pets/add')}
+            className="w-full flex items-center justify-center text-blue-600 border border-dashed border-blue-400 p-3 rounded-lg hover:bg-blue-50 transition-colors mt-2"
+          >
             <Plus className="w-5 h-5 mr-1" />
             <span>Dodaj zwierzaka</span>
           </button>
@@ -85,6 +162,14 @@ const Dashboard: React.FC = () => {
           <span className="text-sm">Historia</span>
         </button>
       </section>
+      
+      {/* Przyciemnienie tła gdy menu jest otwarte */}
+      {isMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-0"
+          onClick={() => setIsMenuOpen(false)}
+        ></div>
+      )}
     </div>
   );
 };
