@@ -1,12 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 
 const PetProfile: React.FC = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
-      <button onClick={() => navigate(-1)} className="text-sm text-blue-600 mb-4">&larr; Profil zwierzaka</button>
+      <button onClick={() => navigate('/dashboard')} className="flex items-center text-sm text-blue-600 mb-4">
+        <ArrowLeft className="w-4 h-4 mr-1" /> Profil zwierzaka
+      </button>
 
       <div className="bg-white p-6 rounded-lg shadow text-center">
         <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4" />
@@ -34,19 +37,31 @@ const PetProfile: React.FC = () => {
       </div>
 
       <div className="mt-6 space-y-4">
-        <button className="w-full flex justify-between items-center bg-white p-4 rounded-lg shadow">
+        <button 
+          onClick={() => navigate('/history')}
+          className="w-full flex justify-between items-center bg-white p-4 rounded-lg shadow"
+        >
           <span>Historia medyczna</span>
           <span className="text-sm text-gray-500">3 wpisy &gt;</span>
         </button>
-        <button className="w-full flex justify-between items-center bg-white p-4 rounded-lg shadow">
+        <button 
+          onClick={() => navigate('/medications')}
+          className="w-full flex justify-between items-center bg-white p-4 rounded-lg shadow"
+        >
           <span>Leki</span>
           <span className="text-sm text-gray-500">2 aktywne &gt;</span>
         </button>
-        <button className="w-full flex justify-between items-center bg-white p-4 rounded-lg shadow">
+        <button 
+          onClick={() => navigate('/appointments')}
+          className="w-full flex justify-between items-center bg-white p-4 rounded-lg shadow"
+        >
           <span>Wizyty</span>
           <span className="text-sm text-gray-500">2 zaplanowane &gt;</span>
         </button>
-        <button className="w-full flex justify-between items-center bg-white p-4 rounded-lg shadow">
+        <button 
+          onClick={() => navigate('/share')}
+          className="w-full flex justify-between items-center bg-white p-4 rounded-lg shadow"
+        >
           <span>Udostępnij historię</span>
           <span className="text-sm text-gray-500">Dla weterynarza &gt;</span>
         </button>
