@@ -2,8 +2,34 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Camera, FileText } from 'lucide-react';
 
+// Definicje typów dla danych OCR
+interface BaseMockedData {
+  type: string;
+  description: string;
+  doctor: string;
+  clinic: string;
+  date: string;
+  notes: string;
+}
+
+interface MedicationData {
+  name: string;
+  dosage: string;
+  frequency: string;
+  startDate: string;
+  endDate: string;
+  notes: string;
+}
+
+interface PrescriptionData extends BaseMockedData {
+  medicationData: MedicationData;
+}
+
+// Typ, który przyjmuje mockedOcrData
+type MockedDataType = BaseMockedData | PrescriptionData;
+
 // Symulowane dane OCR dla różnych typów dokumentów
-const mockedOcrData = {
+const mockedOcrData: Record<string, MockedDataType> = {
   'medical_results': {
     type: 'examination',
     description: 'Badanie krwi - panel podstawowy',
@@ -18,7 +44,16 @@ const mockedOcrData = {
     doctor: 'dr Maria Wiśniewska',
     clinic: 'Klinika Weterynaryjna "Futrzak"',
     date: new Date().toISOString().split('T')[0],
-    notes: 'Dawkowanie: 1 tabletka 2 razy dziennie przez 7 dni. Podawać z jedzeniem.'
+    notes: 'Dawkowanie: 1 tabletka 2 razy dziennie przez 7 dni. Podawać z jedzeniem.',
+    // Dodane dane specyficzne dla leków
+    medicationData: {
+      name: 'Antybiotyk - Amoksycylina',
+      dosage: '1 tabletka',
+      frequency: '2 razy dziennie',
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 7 dni później
+      notes: 'Podawać z jedzeniem. W przypadku wymiotów skontaktować się z lekarzem.'
+    }
   },
   'vaccination': {
     type: 'vaccination',
@@ -38,6 +73,11 @@ const mockedOcrData = {
   }
 };
 
+// Funkcja pomocnicza, sprawdzająca czy dane są typu PrescriptionData
+const isPrescriptionData = (data: MockedDataType): data is PrescriptionData => {
+  return 'medicationData' in data;
+};
+
 const ScanDocument: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -51,8 +91,15 @@ const ScanDocument: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [useCamera, setUseCamera] = useState<boolean>(false);
-  const [documentType, setDocumentType] = useState<string>('');
+  const [documentType, setDocumentType] = useState<string>(redirectTo === 'add-medication' ? 'prescription' : '');
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
+
+  // Ustawienie typu dokumentu na receptę, jeśli przekierowanie jest z formularza dodawania leku
+  useEffect(() => {
+    if (redirectTo === 'add-medication') {
+      setDocumentType('prescription');
+    }
+  }, [redirectTo]);
 
   useEffect(() => {
     if (useCamera && navigator.mediaDevices.getUserMedia) {
@@ -124,6 +171,37 @@ const ScanDocument: React.FC = () => {
             documentId: documentId
           } 
         });
+      } else if (redirectTo === 'add-medication') {
+        // Dla dodawania leku musimy sprawdzić czy mamy dane o leku
+        if (isPrescriptionData(extractedData)) {
+          // Jeśli mamy dane o leku (medicationData), przekazujemy je
+          navigate('/medications/add', { 
+            state: { 
+              medicationData: extractedData.medicationData,
+              documentId: documentId,
+              doctorName: extractedData.doctor || ''
+            } 
+          });
+        } else {
+          // Jeśli nie mamy specificznych danych o leku, tworzymy podstawowe dane z ogólnych informacji
+          const defaultMedicationData = {
+            name: extractedData.description || '',
+            notes: extractedData.notes || '',
+            startDate: extractedData.date || '',
+            // Domyślnie kończy się 7 dni później, jeśli nie określono inaczej
+            endDate: new Date(new Date(extractedData.date).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            dosage: '',
+            frequency: '',
+          };
+
+          navigate('/medications/add', { 
+            state: { 
+              medicationData: defaultMedicationData,
+              documentId: documentId,
+              doctorName: extractedData.doctor || ''
+            } 
+          });
+        }
       } else {
         // W przypadku samodzielnego skanowania, pokaż komunikat o sukcesie i wróć
         navigate(-1);
@@ -232,6 +310,7 @@ const ScanDocument: React.FC = () => {
                           ? 'bg-blue-600 text-white' 
                           : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
                       }`}
+                      disabled={redirectTo === 'add-medication'}
                     >
                       Wyniki badań
                     </button>
@@ -254,6 +333,7 @@ const ScanDocument: React.FC = () => {
                           ? 'bg-blue-600 text-white' 
                           : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
                       }`}
+                      disabled={redirectTo === 'add-medication'}
                     >
                       Karta szczepień
                     </button>
@@ -265,6 +345,7 @@ const ScanDocument: React.FC = () => {
                           ? 'bg-blue-600 text-white' 
                           : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
                       }`}
+                      disabled={redirectTo === 'add-medication'}
                     >
                       Inny dokument
                     </button>
@@ -280,7 +361,12 @@ const ScanDocument: React.FC = () => {
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                 >
-                  {redirectTo === 'add-record' ? 'Analizuj i dodaj do historii' : 'Zapisz dokument'}
+                  {redirectTo === 'add-record' 
+                    ? 'Analizuj i dodaj do historii' 
+                    : redirectTo === 'add-medication'
+                      ? 'Analizuj receptę i dodaj lek'
+                      : 'Zapisz dokument'
+                  }
                 </button>
               </>
             )}
