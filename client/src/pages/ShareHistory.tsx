@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Check, ChevronDown, Copy, Link, Share } from 'lucide-react';
 
 // Przykładowe dane historii medycznej
 const medicalHistoryRecords = [
@@ -40,6 +40,13 @@ const ShareHistory: React.FC = () => {
   const [selectedPet, setSelectedPet] = useState('Burek (Pies, Labrador)');
   const [sharingMode, setSharingMode] = useState<'all' | 'selected'>('all');
   const [showRecordSelector, setShowRecordSelector] = useState(false);
+  const [showLinkShared, setShowLinkShared] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+  
+  // Generowanie kodu tylko raz przy pierwszym renderowaniu
+  const [codeForVet, setCodeForVet] = useState(() => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  });
   
   // Stan dla checkboxów zakresu dostępu
   const [accessScope, setAccessScope] = useState({
@@ -50,6 +57,25 @@ const ShareHistory: React.FC = () => {
 
   // Stan dla wyboru konkretnych wpisów
   const [selectedRecords, setSelectedRecords] = useState<string[]>([]);
+
+  // Generowanie kodu QR
+  const generateQrData = () => {
+    const petName = selectedPet.split(' ')[0];
+    const scope = Object.entries(accessScope)
+      .filter(([_, value]) => value)
+      .map(([key]) => key)
+      .join(',');
+    
+    // Użyj istniejącego kodu zamiast generowania nowego przy każdym renderowaniu
+    return `mZwierzak:pet=${petName},access=${accessTime},scope=${scope},mode=${sharingMode},records=${selectedRecords.join(',')},id=${codeForVet}`;
+  };
+
+  // Generowanie linka do udostępnienia
+  const generateShareLink = () => {
+    const baseUrl = "https://mzwierzak.pl/s/";
+    // Używamy 6-cyfrowego kodu zamiast długiego parametru
+    return `${baseUrl}${codeForVet}`;
+  };
 
   // Filtrowane wpisy dla wybranego zwierzaka
   const filteredRecords = medicalHistoryRecords.filter(
@@ -79,6 +105,37 @@ const ShareHistory: React.FC = () => {
     }
   };
 
+  const refreshQrCode = () => {
+    // Tutaj generujemy nowy kod i resetujemy stany
+    const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+    setCodeForVet(newCode);
+    setLinkCopied(false);
+    setShowLinkShared(false);
+  };
+
+  const shareLink = () => {
+    setShowLinkShared(true);
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(generateShareLink());
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000); // Reset po 2 sekundach
+  };
+
+  // Funkcja do przekierowania do podglądu strony weterynarza (symulacja)
+  const previewVetView = () => {
+    navigate(`/vet-preview/${codeForVet}`, { 
+      state: { 
+        petName: selectedPet.split(' ')[0],
+        accessTime,
+        scope: accessScope,
+        selectedRecords,
+        sharingMode
+      } 
+    });
+  };
+
   // Funkcja zwracająca typ wpisu po polsku
   const getRecordTypeName = (type: string) => {
     switch(type) {
@@ -100,10 +157,10 @@ const ShareHistory: React.FC = () => {
 
       <div className="bg-white p-6 rounded-lg shadow-md">
         <div className="flex flex-col items-center mb-6">
-          {/* Poprawiony kod QR wykorzystujący obraz zamiast ikony */}
+          {/* Kod QR z danymi */}
           <div className="bg-white p-4 border border-gray-200 rounded-lg w-48 h-48 flex items-center justify-center shadow-sm mb-4">
             <img 
-              src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=mZwierzak:pet=Burek,access=30min,id=12345"
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(generateQrData())}`}
               alt="Kod QR" 
               className="w-40 h-40"
             />
@@ -113,6 +170,15 @@ const ShareHistory: React.FC = () => {
             Ten kod QR umożliwia dostęp do historii medycznej zwierzaka
           </p>
           <p className="text-gray-900 font-medium text-xs">Ważny przez: {accessTime}</p>
+
+          {/* Kod dla weterynarza */}
+          <div className="mt-3 border border-gray-200 rounded-md p-2 bg-gray-50 w-full max-w-xs text-center">
+            <p className="text-xs text-gray-500 mb-1">Kod dla weterynarza:</p>
+            <p className="text-xl font-bold tracking-wider text-gray-800">{codeForVet}</p>
+            <p className="text-xs text-gray-500 mt-1">
+              Weterynarz może wpisać ten kod na stronie: mzwierzak.pl/vet
+            </p>
+          </div>
         </div>
 
         <div className="space-y-5">
@@ -258,10 +324,52 @@ const ShareHistory: React.FC = () => {
             </select>
           </div>
 
-          <button className="w-full p-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+          {/* Sekcja dla udostępnionego linku */}
+          {showLinkShared && (
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+              <p className="text-sm text-gray-600 mb-2">Link do udostępnienia:</p>
+              <div className="flex items-center">
+                <input
+                  type="text"
+                  value={generateShareLink()}
+                  readOnly
+                  className="flex-grow p-2 text-sm bg-white border border-gray-300 rounded-l-md focus:outline-none"
+                />
+                <button
+                  onClick={copyToClipboard}
+                  className={`p-2 ${linkCopied ? 'bg-green-600' : 'bg-blue-600'} text-white rounded-r-md`}
+                >
+                  {linkCopied ? <Check size={18} /> : <Copy size={18} />}
+                </button>
+              </div>
+              {linkCopied && (
+                <p className="text-xs text-green-600 mt-1">Skopiowano do schowka!</p>
+              )}
+              <p className="text-xs text-gray-500 mt-2">
+                Ten link umożliwia dostęp do danych zwierzaka przez {accessTime}. Możesz go wysłać weterynarzowi przez SMS lub email.
+              </p>
+              
+              {/* Przycisk do podglądu widoku weterynarza (tylko do celów demonstracyjnych) */}
+              <button
+                onClick={previewVetView}
+                className="mt-3 w-full p-2 bg-gray-200 text-gray-800 rounded-md text-sm hover:bg-gray-300"
+              >
+                Podgląd (jak widzi weterynarz)
+              </button>
+            </div>
+          )}
+
+          <button 
+            onClick={refreshQrCode}
+            className="w-full p-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+          >
             Odśwież kod QR
           </button>
-          <button className="w-full p-3 border border-blue-600 text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors">
+          <button 
+            onClick={shareLink}
+            className="w-full p-3 border border-blue-600 text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors flex items-center justify-center"
+          >
+            <Link size={18} className="mr-2" />
             Udostępnij link
           </button>
         </div>
