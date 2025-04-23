@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import Footer from '../components/Footer';
 
 const PetProfile: React.FC = () => {
   const navigate = useNavigate();
@@ -78,6 +79,7 @@ const PetProfile: React.FC = () => {
           <span className="text-sm text-gray-500">Dla weterynarza &gt;</span>
         </button>
       </div>
+      <Footer/>
     </div>
   );
 };

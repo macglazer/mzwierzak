@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Camera, QrCode, FileText, Menu, Plus, Calendar, Clock, Bell, X, Settings, LogOut } from 'lucide-react';
+import Footer from '../components/Footer';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -8,8 +9,8 @@ const Dashboard: React.FC = () => {
   const [notificationCount, setNotificationCount] = useState(2);
 
   const user = {
-    name: "Jan Kowalski",
-    email: "jan.kowalski@example.com"
+    name: "Maciej Glazer",
+    email: "maciej.glazer@example.com"
   };
 
   const getInitials = (name: string) => {
@@ -102,14 +103,14 @@ const Dashboard: React.FC = () => {
               />
             </div>
             <div>
-              <p className="text-gray-800 font-semibold">Burek</p>
-              <p className="text-sm text-gray-500">Pies, Labrador, 4 lata</p>
+              <p className="text-gray-800 font-semibold">Pluto</p>
+              <p className="text-sm text-gray-500">Pies, Wyzeł, 10 lat</p>
             </div>
           </div>
           <div onClick={() => navigate('/pets/mruczek')} className="bg-white p-4 rounded-lg shadow flex items-center cursor-pointer hover:shadow-md transition-shadow">
             <div className="w-10 h-10 rounded-full mr-3 overflow-hidden">
               <img
-                src="/assets/images/cat-default.png"
+                src="/images/melon.png"
                 alt="Mruczek"
                 className="w-full h-full object-cover"
                 onError={(e) => {
@@ -120,7 +121,7 @@ const Dashboard: React.FC = () => {
               />
             </div>
             <div>
-              <p className="text-gray-800 font-semibold">Mruczek</p>
+              <p className="text-gray-800 font-semibold">Melon</p>
               <p className="text-sm text-gray-500">Kot, Europejski, 2 lata</p>
             </div>
           </div>
@@ -178,10 +179,7 @@ const Dashboard: React.FC = () => {
       )}
 
       {/* Footer */}
-      <footer className="mt-auto text-center text-xs text-gray-500 pt-6 border-t">
-        <p>Supported by Fundacja Drugi Dom</p>
-        <img src="/drugi-dom-logo.png" alt="Mój Drugi Dom logo" className="w-12 h-auto mx-auto mt-2" />
-      </footer>
+      <Footer/>
     </div>
   );
 };
