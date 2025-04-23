@@ -6,14 +6,12 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [notificationCount, setNotificationCount] = useState(2);
-  
-  // Przykładowe dane użytkownika
+
   const user = {
     name: "Jan Kowalski",
     email: "jan.kowalski@example.com"
   };
-  
-  // Pobieramy inicjały
+
   const getInitials = (name: string) => {
     return name.split(' ')
       .map(word => word[0])
@@ -22,12 +20,12 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 relative">
+    <div className="min-h-screen bg-gray-50 p-4 relative flex flex-col">
       <header className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-blue-700">mZwierzak</h1>
+        <h1 className="text-2xl font-bold text-blue-700">petWallet</h1>
         <div className="flex items-center space-x-3">
           <div className="relative cursor-pointer">
-            <Bell 
+            <Bell
               className="w-6 h-6 text-gray-600"
               onClick={() => setNotificationCount(0)}
             />
@@ -37,7 +35,7 @@ const Dashboard: React.FC = () => {
               </span>
             )}
           </div>
-          <div 
+          <div
             className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center cursor-pointer"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
@@ -45,8 +43,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </header>
-      
-      {/* Wysuwalny panel użytkownika */}
+
       {isMenuOpen && (
         <div className="absolute top-0 right-0 h-full w-64 bg-white shadow-lg z-10 transition-transform transform-gpu">
           <div className="p-4 border-b">
@@ -75,7 +72,7 @@ const Dashboard: React.FC = () => {
                 </button>
               </li>
               <li>
-                <button 
+                <button
                   className="flex items-center text-gray-700 hover:text-blue-600 w-full"
                   onClick={() => navigate('/login')}
                 >
@@ -92,20 +89,42 @@ const Dashboard: React.FC = () => {
         <h2 className="text-lg font-semibold text-gray-800 mb-2">Twoje zwierzaki</h2>
         <div className="space-y-2">
           <div onClick={() => navigate('/pets/burek')} className="bg-white p-4 rounded-lg shadow flex items-center cursor-pointer hover:shadow-md transition-shadow">
-            <div className="w-10 h-10 bg-blue-100 rounded-full mr-3"></div>
+            <div className="w-10 h-10 rounded-full mr-3 overflow-hidden">
+              <img
+                src="/images/panPluto.jpg"
+                alt="Burek"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  target.parentElement!.classList.add('bg-blue-100');
+                }}
+              />
+            </div>
             <div>
               <p className="text-gray-800 font-semibold">Burek</p>
               <p className="text-sm text-gray-500">Pies, Labrador, 4 lata</p>
             </div>
           </div>
           <div onClick={() => navigate('/pets/mruczek')} className="bg-white p-4 rounded-lg shadow flex items-center cursor-pointer hover:shadow-md transition-shadow">
-            <div className="w-10 h-10 bg-orange-100 rounded-full mr-3"></div>
+            <div className="w-10 h-10 rounded-full mr-3 overflow-hidden">
+              <img
+                src="/assets/images/cat-default.png"
+                alt="Mruczek"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  target.parentElement!.classList.add('bg-orange-100');
+                }}
+              />
+            </div>
             <div>
               <p className="text-gray-800 font-semibold">Mruczek</p>
               <p className="text-sm text-gray-500">Kot, Europejski, 2 lata</p>
             </div>
           </div>
-          <button 
+          <button
             onClick={() => navigate('/pets/add')}
             className="w-full flex items-center justify-center text-blue-600 border border-dashed border-blue-400 p-3 rounded-lg hover:bg-blue-50 transition-colors mt-2"
           >
@@ -139,37 +158,30 @@ const Dashboard: React.FC = () => {
         </div>
       </section>
 
-      <section className="grid grid-cols-3 gap-4">
-        <button 
-          onClick={() => navigate('/scan')} 
-          className="flex flex-col items-center justify-center bg-blue-100 text-blue-700 p-4 rounded-lg shadow hover:shadow-md hover:bg-blue-200 transition-all"
-        >
+      <section className="grid grid-cols-3 gap-4 mb-10">
+        <button onClick={() => navigate('/scan')} className="flex flex-col items-center justify-center bg-blue-100 text-blue-700 p-4 rounded-lg shadow hover:shadow-md hover:bg-blue-200 transition-all">
           <Camera className="w-6 h-6 mb-1" />
           <span className="text-sm">Skanuj</span>
         </button>
-        <button 
-          onClick={() => navigate('/share')} 
-          className="flex flex-col items-center justify-center bg-green-100 text-green-700 p-4 rounded-lg shadow hover:shadow-md hover:bg-green-200 transition-all"
-        >
+        <button onClick={() => navigate('/share')} className="flex flex-col items-center justify-center bg-green-100 text-green-700 p-4 rounded-lg shadow hover:shadow-md hover:bg-green-200 transition-all">
           <QrCode className="w-6 h-6 mb-1" />
           <span className="text-sm">Udostępnij</span>
         </button>
-        <button 
-          onClick={() => navigate('/history')}
-          className="flex flex-col items-center justify-center bg-purple-100 text-purple-700 p-4 rounded-lg shadow hover:shadow-md hover:bg-purple-200 transition-all"
-        >
+        <button onClick={() => navigate('/history')} className="flex flex-col items-center justify-center bg-purple-100 text-purple-700 p-4 rounded-lg shadow hover:shadow-md hover:bg-purple-200 transition-all">
           <FileText className="w-6 h-6 mb-1" />
           <span className="text-sm">Historia</span>
         </button>
       </section>
-      
-      {/* Przyciemnienie tła gdy menu jest otwarte */}
+
       {isMenuOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-0"
-          onClick={() => setIsMenuOpen(false)}
-        ></div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-0" onClick={() => setIsMenuOpen(false)}></div>
       )}
+
+      {/* Footer */}
+      <footer className="mt-auto text-center text-xs text-gray-500 pt-6 border-t">
+        <p>Supported by Mój Drugi Dom</p>
+        <img src="/drugi-dom-logo.png" alt="Mój Drugi Dom logo" className="w-12 h-auto mx-auto mt-2" />
+      </footer>
     </div>
   );
 };
