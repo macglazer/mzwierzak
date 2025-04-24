@@ -53,7 +53,7 @@ const Login: React.FC = () => {
   return (
     <div className="bg-white min-h-screen p-6 flex flex-col justify-center">
       <div className="mb-12 text-center">
-        <h1 className="text-3xl font-bold text-blue-600 mb-2">mZwierzak</h1>
+        <h1 className="text-3xl font-bold text-blue-600 mb-2">petWallet</h1>
         <p className="text-gray-600">Zaloguj się do swojego konta</p>
       </div>
       
